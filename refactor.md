@@ -9,3 +9,4 @@
 Unused features:
 * slow decay (deaceleration) (SumoDrive.h)
 * Motor as buzzer (SumoDrive.h)
+* Pixel led display patterns (LEDFX.h)
