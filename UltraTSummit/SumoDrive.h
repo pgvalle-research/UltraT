@@ -185,7 +185,6 @@ class DRV8833 {
     // ===========================================================
 
     void move   (int16_t vl, int16_t vr) { write   (vl, 0); write   (vr, 1); }
-    void moveSD (int16_t vl, int16_t vr) { writeSD (vl, 0); writeSD (vr, 1); }
     void moveRaw(int16_t vl, int16_t vr) { writeRaw(vl, 0); writeRaw(vr, 1); }
 
     // Freio ativo (curto-circuita os terminais — para mais rápido)
@@ -224,31 +223,6 @@ class DRV8833 {
       #else
         if (vel >= 0) { analogWrite(pins[0+m],  vel); analogWrite(pins[1+m], 0); }
         else          { analogWrite(pins[1+m], -vel); analogWrite(pins[0+m], 0); }
-      #endif
-    }
-
-    // Modo slow-decay (frenagem mais suave)
-    void writeSD(uint16_t vel, int8_t motor) { //! checar se isso funciona e como
-      if (motor > 1) return;
-      _vels[motor] = vel; //! era pra ser isso mesmo ou o que usa embaixo?
-      const int m = 2*motor;
-      //! writeRaw(MAX+-vel) em vez disso embaixo
-      #ifdef ESP32
-        if (vel >= 0) {
-            ledcWrite(pins[0+m], PWM_MAX);
-            ledcWrite(pins[1+m], PWM_MAX-vel);
-        } else {
-            ledcWrite(pins[0+m], PWM_MAX+vel); // já negativo
-            ledcWrite(pins[1+m], PWM_MAX);
-        }
-      #else
-        if (vel < 0) {
-            analogWrite(pins[0+m], PWM_MAX+vel);
-            analogWrite(pins[1+m], PWM_MAX);
-        } else {
-            analogWrite(pins[0+m], PWM_MAX);
-            analogWrite(pins[1+m], PWM_MAX-vel); // já negativo
-        }
       #endif
     }
 
