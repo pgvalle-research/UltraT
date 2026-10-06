@@ -225,63 +225,6 @@ class DRV8833 {
         else          { analogWrite(pins[1+m], -vel); analogWrite(pins[0+m], 0); }
       #endif
     }
-
-    // ===========================================================
-    //  SOM — uso dos motores como buzzer
-    // ===========================================================
-
-    void     sound_vol(uint8_t vol) { if (vol <= 25) SOUND_VOL = vol; }
-    uint16_t sound_duty()           { return SOUND_VOL * (PWM_MAX / 100); }
-
-    // Emite n bipes em ambos os motores
-    void bip(uint8_t n, uint16_t dt, uint32_t tone) { //! unificar com bip(motor)
-                                                      //! bip->beep/bipe
-      sound_tone(tone);
-      uint16_t duty = sound_duty();
-      for (int i = 0; i < n; i++) {
-        moveRaw(duty, duty); delay(dt);
-        moveRaw(0,    0);    delay(dt);
-      }
-      sound_stop();
-    }
-
-    // Emite n bipes em um motor específico
-    void bip(uint8_t n, uint16_t dt, uint32_t tone, uint8_t motor) {
-      if (motor > 1) return;
-      sound_tone(tone, motor);
-      uint16_t duty = sound_duty();
-      for (int i = 0; i < n; i++) {
-        writeRaw(duty, motor); delay(dt);
-        writeRaw(0,    motor); delay(dt);
-      }
-      sound_stop(motor);
-    }
-
-    void sound_tone(uint32_t tone) { sound_tone(tone, 0); sound_tone(tone, 1); }
-
-    void sound_tone(uint32_t tone, uint8_t motor) {
-      if (motor > 1) return;
-      #ifdef ESP32
-        ledcAttach(pins[0 + 2*motor], tone, PWM_RES);
-        ledcAttach(pins[1 + 2*motor], tone, PWM_RES);
-      #else
-        analogWriteFreq(tone);
-      #endif
-      writeRaw(sound_duty(), motor);
-    }
-
-    void sound_stop() { sound_stop(0); sound_stop(1); }
-
-    void sound_stop(uint8_t motor) {
-      if (motor > 1) return;
-      #ifdef ESP32
-        ledcAttach(pins[0 + 2*motor], PWM_HZ, PWM_RES);
-        ledcAttach(pins[1 + 2*motor], PWM_HZ, PWM_RES);
-      #else
-        analogWriteFreq(PWM_HZ);
-      #endif
-      write(_vels[motor], motor);
-    }
 };
 
 #endif // DRV8833_H

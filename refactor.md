@@ -7,4 +7,5 @@
 5. Test
 
 Unused features:
-* slow decay (deaceleration)
+* slow decay (deaceleration) (SumoDrive.h)
+* Motor as buzzer (SumoDrive.h)
